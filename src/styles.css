@@ -357,6 +357,285 @@ tbody tr:hover {
   font-weight: 600;
 }
 
+/* ---------- Notes: header ---------- */
+.notes-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.notes-header h2 {
+  margin: 0;
+}
+
+.note-count {
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #4338ca;
+  background: var(--grad-soft);
+  border: 1px solid var(--border);
+}
+
+/* ---------- Notes: composer ---------- */
+.composer {
+  background: var(--card);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 8px;
+  margin-bottom: 26px;
+  max-width: 620px;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.composer.is-open {
+  padding: 16px;
+  box-shadow: 0 18px 40px -16px rgba(30, 27, 75, 0.45);
+}
+
+.composer-trigger {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 12px 14px;
+  background: transparent;
+  color: var(--muted);
+  font-weight: 600;
+  text-align: left;
+  box-shadow: none;
+  border-radius: 10px;
+}
+
+.composer-trigger:hover:not(:disabled) {
+  transform: none;
+  background: var(--grad-soft);
+  box-shadow: none;
+  color: #4f46e5;
+}
+
+.composer-trigger__icon {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
+  background: var(--grad);
+  color: #fff;
+  font-size: 1.1rem;
+  line-height: 1;
+  flex: none;
+}
+
+.composer-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  border: none;
+  background: transparent;
+  padding: 6px 4px;
+  margin: 0 0 4px;
+}
+
+.composer-title:focus {
+  box-shadow: none;
+  border: none;
+}
+
+.composer-body {
+  border: none;
+  background: transparent;
+  padding: 6px 4px;
+  margin: 0;
+  resize: vertical;
+}
+
+.composer-body:focus {
+  box-shadow: none;
+  border: none;
+}
+
+.composer-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+
+/* ---------- Notes: board grid ---------- */
+.notes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 16px;
+}
+
+.note-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background: var(--card);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px 18px 14px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  animation: pop 0.35s ease both;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.note-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 5px;
+  background: var(--accent, var(--grad));
+}
+
+.note-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 42px -16px rgba(30, 27, 75, 0.5);
+}
+
+.note-card__title {
+  margin: 0 0 8px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text);
+  word-break: break-word;
+}
+
+.note-card__body {
+  margin: 0 0 16px;
+  color: #475569;
+  font-size: 0.92rem;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-word;
+  display: -webkit-box;
+  -webkit-line-clamp: 6;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.note-card__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: auto;
+}
+
+.note-card__date {
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.note-card__actions {
+  display: flex;
+  gap: 6px;
+  opacity: 0;
+  transform: translateY(2px);
+  transition: opacity 0.18s ease, transform 0.18s ease;
+}
+
+.note-card:hover .note-card__actions,
+.note-card:focus-within .note-card__actions {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Small square icon buttons (edit / delete / close). */
+.icon-btn {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  font-size: 0.95rem;
+  color: var(--muted);
+  background: rgba(148, 163, 184, 0.12);
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  box-shadow: none;
+}
+
+.icon-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  color: #4f46e5;
+  background: var(--grad-soft);
+  box-shadow: none;
+}
+
+.icon-btn--danger:hover:not(:disabled) {
+  color: #fff;
+  background: linear-gradient(135deg, #f87171, #ef4444);
+  border-color: transparent;
+}
+
+/* ---------- Notes: empty state ---------- */
+.note-empty {
+  text-align: center;
+  padding: 60px 20px;
+  background: var(--card);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius);
+  animation: pop 0.35s ease both;
+}
+
+.note-empty__icon {
+  font-size: 2.6rem;
+  margin-bottom: 10px;
+}
+
+.note-empty h3 {
+  margin: 0 0 6px;
+}
+
+/* ---------- Modal ---------- */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(15, 23, 42, 0.5);
+  backdrop-filter: blur(4px);
+  animation: fadeInUp 0.2s ease both;
+}
+
+.modal {
+  width: 100%;
+  max-width: 520px;
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 22px 22px 18px;
+  box-shadow: 0 30px 70px -20px rgba(15, 23, 42, 0.6);
+  animation: pop 0.25s ease both;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.modal-header h3 {
+  margin: 0;
+}
+
 /* ---------- Auth pages ---------- */
 .auth-page {
   min-height: 100vh;
