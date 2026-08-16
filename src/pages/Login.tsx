@@ -21,33 +21,33 @@ export const Login = () => {
   };
 
   return (
-    <div className="container form-narrow">
-      <h2>Login</h2>
-      <form onSubmit={submit}>
-        <input
-          placeholder="Email"
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          style={{ width: '100%' }}
-          required
-        />
-        <input
-          placeholder="Password"
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          style={{ width: '100%' }}
-          required
-        />
-        <button type="submit" style={{ width: '100%' }}>
-          Login
-        </button>
-      </form>
-      {error && <p className="error">{error}</p>}
-      <p>
-        No account? <Link to="/register">Register</Link>
-      </p>
+    <div className="auth-page">
+      <div className="auth-card">
+        <div className="logo">N</div>
+        <h2>Welcome back</h2>
+        <p className="subtitle">Sign in to your notes workspace</p>
+        <form onSubmit={submit}>
+          <input
+            placeholder="Email"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+          <input
+            placeholder="Password"
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+          {error && <p className="error">{error}</p>}
+          <button type="submit">Sign in</button>
+        </form>
+        <p className="switch">
+          No account? <Link to="/register">Create one</Link>
+        </p>
+      </div>
     </div>
   );
 };

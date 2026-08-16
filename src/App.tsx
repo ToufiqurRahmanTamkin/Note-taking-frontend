@@ -24,17 +24,17 @@ const NavBar = () => {
   if (!user) return null;
   return (
     <nav>
-      <strong>Notes App</strong>
+      <span className="brand">◆ Notes</span>
       <Link to="/notes">My Notes</Link>
       <Link to="/posts">Posts by User</Link>
       {user.role === 'admin' && <Link to="/admin/users">Users</Link>}
       {user.role === 'admin' && <Link to="/admin/notes">All Notes</Link>}
       {user.role === 'admin' && <Link to="/admin/interests">Interests</Link>}
       <span className="spacer" />
-      <span>
-        {user.name} ({user.role})
-      </span>
+      <span className="who">{user.name}</span>
+      <span className={`badge ${user.role === 'admin' ? 'admin' : ''}`}>{user.role}</span>
       <button
+        className="btn-ghost"
         onClick={() => {
           logout();
           navigate('/login');

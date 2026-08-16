@@ -87,7 +87,7 @@ export const Notes = () => {
         <div className="row">
           <button type="submit">{editingId ? 'Save' : 'Add note'}</button>
           {editingId && (
-            <button type="button" onClick={resetForm}>
+            <button type="button" className="btn-ghost" onClick={resetForm}>
               Cancel
             </button>
           )}
@@ -100,14 +100,16 @@ export const Notes = () => {
         <div key={note._id} className="card">
           <div className="row" style={{ justifyContent: 'space-between' }}>
             <strong>{note.title}</strong>
-            <span style={{ fontSize: 12, color: '#666' }}>
-              {new Date(note.createdAt).toLocaleString()}
-            </span>
+            <span className="muted">{new Date(note.createdAt).toLocaleString()}</span>
           </div>
           <p>{note.content}</p>
           <div className="row">
-            <button onClick={() => edit(note)}>Edit</button>
-            <button onClick={() => remove(note._id)}>Delete</button>
+            <button className="btn-ghost" onClick={() => edit(note)}>
+              Edit
+            </button>
+            <button className="btn-danger" onClick={() => remove(note._id)}>
+              Delete
+            </button>
           </div>
         </div>
       ))}

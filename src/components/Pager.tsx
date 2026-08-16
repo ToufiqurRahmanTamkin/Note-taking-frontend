@@ -7,15 +7,23 @@ interface Props {
 
 /** Reusable prev/next pager driven by the backend pagination metadata. */
 export const Pager = ({ pagination, onChange }: Props) => (
-  <div style={{ display: 'flex', gap: 12, alignItems: 'center', marginTop: 12 }}>
-    <button disabled={!pagination.hasPrevPage} onClick={() => onChange(pagination.page - 1)}>
-      Prev
+  <div className="pager">
+    <button
+      className="btn-ghost"
+      disabled={!pagination.hasPrevPage}
+      onClick={() => onChange(pagination.page - 1)}
+    >
+      ‹ Prev
     </button>
     <span>
-      Page {pagination.page} / {pagination.totalPages} ({pagination.total} total)
+      Page {pagination.page} of {pagination.totalPages} · {pagination.total} total
     </span>
-    <button disabled={!pagination.hasNextPage} onClick={() => onChange(pagination.page + 1)}>
-      Next
+    <button
+      className="btn-ghost"
+      disabled={!pagination.hasNextPage}
+      onClick={() => onChange(pagination.page + 1)}
+    >
+      Next ›
     </button>
   </div>
 );

@@ -122,7 +122,7 @@ export const AdminUsers = () => {
         <div className="row">
           <button type="submit">{editingId ? 'Save' : 'Add user'}</button>
           {editingId && (
-            <button type="button" onClick={resetForm}>
+            <button type="button" className="btn-ghost" onClick={resetForm}>
               Cancel
             </button>
           )}
@@ -131,33 +131,41 @@ export const AdminUsers = () => {
 
       {error && <p className="error">{error}</p>}
 
-      <table>
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Role</th>
-            <th>Interests</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {result?.data.map((u) => (
-            <tr key={u._id}>
-              <td>{u.name}</td>
-              <td>{u.email}</td>
-              <td>{u.role}</td>
-              <td>{u.interests.join(', ')}</td>
-              <td>
-                <div className="row">
-                  <button onClick={() => edit(u)}>Edit</button>
-                  <button onClick={() => remove(u._id)}>Delete</button>
-                </div>
-              </td>
+      <div className="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Role</th>
+              <th>Interests</th>
+              <th>Actions</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {result?.data.map((u) => (
+              <tr key={u._id}>
+                <td>{u.name}</td>
+                <td>{u.email}</td>
+                <td>
+                  <span className={`badge ${u.role === 'admin' ? 'admin' : ''}`}>{u.role}</span>
+                </td>
+                <td>{u.interests.join(', ')}</td>
+                <td>
+                  <div className="row">
+                    <button className="btn-ghost" onClick={() => edit(u)}>
+                      Edit
+                    </button>
+                    <button className="btn-danger" onClick={() => remove(u._id)}>
+                      Delete
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
       {result && <Pager pagination={result.pagination} onChange={setPage} />}
     </div>

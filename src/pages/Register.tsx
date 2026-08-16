@@ -27,46 +27,44 @@ export const Register = () => {
   };
 
   return (
-    <div className="container form-narrow">
-      <h2>Register</h2>
-      <form onSubmit={submit}>
-        <input
-          placeholder="Name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          style={{ width: '100%' }}
-          required
-        />
-        <input
-          placeholder="Email"
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          style={{ width: '100%' }}
-          required
-        />
-        <input
-          placeholder="Password"
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          style={{ width: '100%' }}
-          required
-        />
-        <input
-          placeholder="Interests (comma separated, e.g. chess, reading)"
-          value={interests}
-          onChange={(e) => setInterests(e.target.value)}
-          style={{ width: '100%' }}
-        />
-        <button type="submit" style={{ width: '100%' }}>
-          Create account
-        </button>
-      </form>
-      {error && <p className="error">{error}</p>}
-      <p>
-        Have an account? <Link to="/login">Login</Link>
-      </p>
+    <div className="auth-page">
+      <div className="auth-card">
+        <div className="logo">N</div>
+        <h2>Create account</h2>
+        <p className="subtitle">Start capturing your notes in seconds</p>
+        <form onSubmit={submit}>
+          <input
+            placeholder="Name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+          />
+          <input
+            placeholder="Email"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+          <input
+            placeholder="Password"
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+          <input
+            placeholder="Interests (comma separated, e.g. chess, reading)"
+            value={interests}
+            onChange={(e) => setInterests(e.target.value)}
+          />
+          {error && <p className="error">{error}</p>}
+          <button type="submit">Create account</button>
+        </form>
+        <p className="switch">
+          Have an account? <Link to="/login">Sign in</Link>
+        </p>
+      </div>
     </div>
   );
 };

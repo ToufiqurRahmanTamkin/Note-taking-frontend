@@ -48,26 +48,28 @@ export const AdminNotes = () => {
 
       {error && <p className="error">{error}</p>}
 
-      <table>
-        <thead>
-          <tr>
-            <th>Title</th>
-            <th>Content</th>
-            <th>Owner</th>
-            <th>Created</th>
-          </tr>
-        </thead>
-        <tbody>
-          {result?.data.map((n) => (
-            <tr key={n._id}>
-              <td>{n.title}</td>
-              <td>{n.content}</td>
-              <td style={{ fontFamily: 'monospace', fontSize: 12 }}>{n.owner}</td>
-              <td>{new Date(n.createdAt).toLocaleString()}</td>
+      <div className="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Content</th>
+              <th>Owner</th>
+              <th>Created</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {result?.data.map((n) => (
+              <tr key={n._id}>
+                <td>{n.title}</td>
+                <td>{n.content}</td>
+                <td className="mono">{n.owner}</td>
+                <td>{new Date(n.createdAt).toLocaleString()}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
       {result && <Pager pagination={result.pagination} onChange={setPage} />}
     </div>
