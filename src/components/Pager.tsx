@@ -3,14 +3,16 @@ import { Pagination } from '../types';
 interface Props {
   pagination: Pagination;
   onChange: (page: number) => void;
+  /** Disable navigation while a page fetch is in flight. */
+  loading?: boolean;
 }
 
 /** Reusable prev/next pager driven by the backend pagination metadata. */
-export const Pager = ({ pagination, onChange }: Props) => (
+export const Pager = ({ pagination, onChange, loading }: Props) => (
   <div className="pager">
     <button
       className="btn-ghost"
-      disabled={!pagination.hasPrevPage}
+      disabled={loading || !pagination.hasPrevPage}
       onClick={() => onChange(pagination.page - 1)}
     >
       ‹ Prev
@@ -20,7 +22,7 @@ export const Pager = ({ pagination, onChange }: Props) => (
     </span>
     <button
       className="btn-ghost"
-      disabled={!pagination.hasNextPage}
+      disabled={loading || !pagination.hasNextPage}
       onClick={() => onChange(pagination.page + 1)}
     >
       Next ›

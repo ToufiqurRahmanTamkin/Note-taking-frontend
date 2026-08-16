@@ -1,6 +1,7 @@
 import { FormEvent, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { Button } from '../components/Button';
 
 export const Register = () => {
   const { register } = useAuth();
@@ -10,10 +11,12 @@ export const Register = () => {
   const [password, setPassword] = useState('');
   const [interests, setInterests] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const submit = async (e: FormEvent) => {
     e.preventDefault();
     setError('');
+    setLoading(true);
     try {
       const list = interests
         .split(',')
@@ -23,6 +26,7 @@ export const Register = () => {
       navigate('/notes');
     } catch (err) {
       setError((err as Error).message);
+      setLoading(false);
     }
   };
 
@@ -59,7 +63,9 @@ export const Register = () => {
             onChange={(e) => setInterests(e.target.value)}
           />
           {error && <p className="error">{error}</p>}
-          <button type="submit">Create account</button>
+          <Button type="submit" loading={loading}>
+            {loading ? 'Creating account…' : 'Create account'}
+          </Button>
         </form>
         <p className="switch">
           Have an account? <Link to="/login">Sign in</Link>

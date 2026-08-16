@@ -1,5 +1,6 @@
 import { FormEvent, useState } from 'react';
 import { api } from '../api/client';
+import { Button } from '../components/Button';
 
 interface PostView {
   id: string;
@@ -21,31 +22,40 @@ export const UserPosts = () => {
   const [result, setResult] = useState<UserPostsResult | null>(null);
   const [error, setError] = useState('');
 
+  const [fetching, setFetching] = useState(false);
+
   // Optional helper: create a post for the current user to have data to look up.
   const [title, setTitle] = useState('');
   const [body, setBody] = useState('');
+  const [posting, setPosting] = useState(false);
 
   const fetchPosts = async (e: FormEvent) => {
     e.preventDefault();
     setError('');
     setResult(null);
+    setFetching(true);
     try {
       const res = await api<{ data: UserPostsResult }>(`/aggregations/users/${userId}/posts`);
       setResult(res.data);
     } catch (err) {
       setError((err as Error).message);
+    } finally {
+      setFetching(false);
     }
   };
 
   const createPost = async (e: FormEvent) => {
     e.preventDefault();
     setError('');
+    setPosting(true);
     try {
       await api('/posts', { method: 'POST', body: { title, body } });
       setTitle('');
       setBody('');
     } catch (err) {
       setError((err as Error).message);
+    } finally {
+      setPosting(false);
     }
   };
 
@@ -69,7 +79,9 @@ export const UserPosts = () => {
           rows={2}
           style={{ width: '100%' }}
         />
-        <button type="submit">Add post</button>
+        <Button type="submit" loading={posting}>
+          Add post
+        </Button>
       </form>
 
       <form onSubmit={fetchPosts} className="card row">
@@ -80,7 +92,9 @@ export const UserPosts = () => {
           style={{ flex: 1 }}
           required
         />
-        <button type="submit">Fetch posts</button>
+        <Button type="submit" loading={fetching}>
+          Fetch posts
+        </Button>
       </form>
 
       {error && <p className="error">{error}</p>}

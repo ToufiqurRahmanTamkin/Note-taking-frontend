@@ -300,6 +300,48 @@ tbody tr:hover {
   color: var(--muted);
 }
 
+/* ---------- Spinner ---------- */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.spinner {
+  display: inline-block;
+  width: 15px;
+  height: 15px;
+  border: 2px solid rgba(255, 255, 255, 0.45);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+.spinner.dark {
+  border-color: rgba(99, 102, 241, 0.25);
+  border-top-color: #6366f1;
+}
+
+.spinner.lg {
+  width: 34px;
+  height: 34px;
+  border-width: 3px;
+}
+
+.btn-content {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.loading-wrap {
+  display: grid;
+  place-items: center;
+  gap: 12px;
+  padding: 48px 0;
+  color: var(--muted);
+  animation: pop 0.3s ease both;
+}
+
 /* ---------- Pager ---------- */
 .pager {
   display: flex;

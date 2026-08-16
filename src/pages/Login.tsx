@@ -1,6 +1,7 @@
 import { FormEvent, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { Button } from '../components/Button';
 
 export const Login = () => {
   const { login } = useAuth();
@@ -8,15 +9,18 @@ export const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const submit = async (e: FormEvent) => {
     e.preventDefault();
     setError('');
+    setLoading(true);
     try {
       await login(email, password);
       navigate('/notes');
     } catch (err) {
       setError((err as Error).message);
+      setLoading(false);
     }
   };
 
@@ -42,7 +46,9 @@ export const Login = () => {
             required
           />
           {error && <p className="error">{error}</p>}
-          <button type="submit">Sign in</button>
+          <Button type="submit" loading={loading}>
+            {loading ? 'Signing in…' : 'Sign in'}
+          </Button>
         </form>
         <p className="switch">
           No account? <Link to="/register">Create one</Link>

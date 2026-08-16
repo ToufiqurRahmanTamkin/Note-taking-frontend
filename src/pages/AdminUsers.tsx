@@ -2,6 +2,8 @@ import { FormEvent, useCallback, useEffect, useState } from 'react';
 import { api } from '../api/client';
 import { Paginated, User } from '../types';
 import { Pager } from '../components/Pager';
+import { Button } from '../components/Button';
+import { Spinner } from '../components/Spinner';
 
 const emptyForm = { name: '', email: '', password: '', role: 'user', interests: '' };
 
@@ -9,16 +11,22 @@ export const AdminUsers = () => {
   const [page, setPage] = useState(1);
   const [result, setResult] = useState<Paginated<User> | null>(null);
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(true);
 
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState({ ...emptyForm });
+  const [submitting, setSubmitting] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     setError('');
+    setLoading(true);
     try {
       setResult(await api<Paginated<User>>(`/users?page=${page}&limit=5`));
     } catch (err) {
       setError((err as Error).message);
+    } finally {
+      setLoading(false);
     }
   }, [page]);
 
@@ -34,6 +42,7 @@ export const AdminUsers = () => {
   const submit = async (e: FormEvent) => {
     e.preventDefault();
     setError('');
+    setSubmitting(true);
     const interests = form.interests
       .split(',')
       .map((s) => s.trim())
@@ -58,6 +67,8 @@ export const AdminUsers = () => {
       await load();
     } catch (err) {
       setError((err as Error).message);
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -73,11 +84,15 @@ export const AdminUsers = () => {
   };
 
   const remove = async (id: string) => {
+    setError('');
+    setDeletingId(id);
     try {
       await api(`/users/${id}`, { method: 'DELETE' });
       await load();
     } catch (err) {
       setError((err as Error).message);
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -120,7 +135,9 @@ export const AdminUsers = () => {
           style={{ width: '100%' }}
         />
         <div className="row">
-          <button type="submit">{editingId ? 'Save' : 'Add user'}</button>
+          <Button type="submit" loading={submitting}>
+            {editingId ? 'Save' : 'Add user'}
+          </Button>
           {editingId && (
             <button type="button" className="btn-ghost" onClick={resetForm}>
               Cancel
@@ -131,43 +148,58 @@ export const AdminUsers = () => {
 
       {error && <p className="error">{error}</p>}
 
-      <div className="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Email</th>
-              <th>Role</th>
-              <th>Interests</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {result?.data.map((u) => (
-              <tr key={u._id}>
-                <td>{u.name}</td>
-                <td>{u.email}</td>
-                <td>
-                  <span className={`badge ${u.role === 'admin' ? 'admin' : ''}`}>{u.role}</span>
-                </td>
-                <td>{u.interests.join(', ')}</td>
-                <td>
-                  <div className="row">
-                    <button className="btn-ghost" onClick={() => edit(u)}>
-                      Edit
-                    </button>
-                    <button className="btn-danger" onClick={() => remove(u._id)}>
-                      Delete
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      {loading && !result ? (
+        <div className="loading-wrap">
+          <Spinner size="lg" dark />
+          Loading users…
+        </div>
+      ) : (
+        <>
+          <div className="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Role</th>
+                  <th>Interests</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {result?.data.map((u) => (
+                  <tr key={u._id}>
+                    <td>{u.name}</td>
+                    <td>{u.email}</td>
+                    <td>
+                      <span className={`badge ${u.role === 'admin' ? 'admin' : ''}`}>{u.role}</span>
+                    </td>
+                    <td>{u.interests.join(', ')}</td>
+                    <td>
+                      <div className="row">
+                        <button className="btn-ghost" onClick={() => edit(u)}>
+                          Edit
+                        </button>
+                        <Button
+                          className="btn-danger"
+                          loading={deletingId === u._id}
+                          onClick={() => remove(u._id)}
+                        >
+                          Delete
+                        </Button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
 
-      {result && <Pager pagination={result.pagination} onChange={setPage} />}
+          {result && (
+            <Pager pagination={result.pagination} loading={loading} onChange={setPage} />
+          )}
+        </>
+      )}
     </div>
   );
 };

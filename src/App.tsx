@@ -1,6 +1,7 @@
 import { Navigate, Route, Routes, Link, useNavigate } from 'react-router-dom';
 import { ReactNode } from 'react';
 import { useAuth } from './context/AuthContext';
+import { Spinner } from './components/Spinner';
 import { Login } from './pages/Login';
 import { Register } from './pages/Register';
 import { Notes } from './pages/Notes';
@@ -12,7 +13,12 @@ import { UserPosts } from './pages/UserPosts';
 /** Route guard: requires a logged-in user, and optionally the admin role. */
 const Protected = ({ children, adminOnly }: { children: ReactNode; adminOnly?: boolean }) => {
   const { user, loading } = useAuth();
-  if (loading) return <p className="container">Loading…</p>;
+  if (loading)
+    return (
+      <div className="loading-wrap" style={{ minHeight: '60vh' }}>
+        <Spinner size="lg" dark />
+      </div>
+    );
   if (!user) return <Navigate to="/login" replace />;
   if (adminOnly && user.role !== 'admin') return <Navigate to="/notes" replace />;
   return <>{children}</>;
