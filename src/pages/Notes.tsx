@@ -1,12 +1,13 @@
-import { FormEvent, useCallback, useEffect, useRef, useState } from 'react';
+import { FormEvent, useCallback, useEffect, useState } from 'react';
 import { api } from '../api/client';
 import { Note, Paginated } from '../types';
 import { Pager } from '../components/Pager';
 import { Button } from '../components/Button';
 import { Spinner } from '../components/Spinner';
+import { Modal } from '../components/Modal';
 
 /** Deterministic accent per note so the board has gentle, stable colour variety. */
-const ACCENTS = ['#6366f1', '#8b5cf6', '#ec4899', '#0ea5e9', '#10b981', '#f59e0b'];
+const ACCENTS = ['#818cf8', '#a78bfa', '#f472b6', '#38bdf8', '#34d399', '#fbbf24'];
 const accentFor = (id: string) => {
   let h = 0;
   for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) >>> 0;
@@ -22,20 +23,19 @@ export const Notes = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
 
-  // Composer (create) state.
-  const [composerOpen, setComposerOpen] = useState(false);
+  // Create-modal state.
+  const [creating, setCreating] = useState(false);
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
-  // Edit-modal state — editing happens in an overlay instead of scrolling away.
+  // Edit-modal state.
   const [editing, setEditing] = useState<Note | null>(null);
   const [editTitle, setEditTitle] = useState('');
   const [editContent, setEditContent] = useState('');
   const [savingEdit, setSavingEdit] = useState(false);
 
   const [deletingId, setDeletingId] = useState<string | null>(null);
-  const composerContentRef = useRef<HTMLTextAreaElement>(null);
 
   const load = useCallback(async () => {
     setError('');
@@ -54,18 +54,10 @@ export const Notes = () => {
     load();
   }, [load]);
 
-  // Close the edit modal on Escape for keyboard users.
-  useEffect(() => {
-    if (!editing) return;
-    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setEditing(null);
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [editing]);
-
-  const closeComposer = () => {
-    setComposerOpen(false);
+  const openCreate = () => {
     setTitle('');
     setContent('');
+    setCreating(true);
   };
 
   const create = async (e: FormEvent) => {
@@ -74,7 +66,7 @@ export const Notes = () => {
     setSubmitting(true);
     try {
       await api('/notes', { method: 'POST', body: { title, content } });
-      closeComposer();
+      setCreating(false);
       if (page !== 1) setPage(1);
       else await load();
     } catch (err) {
@@ -129,52 +121,17 @@ export const Notes = () => {
   return (
     <div className="container">
       <div className="notes-header">
-        <h2>My Notes</h2>
-        {result && <span className="note-count">{result.pagination.total} total</span>}
+        <div>
+          <h2>My Notes</h2>
+          <p className="page-subtitle">Your private workspace — only you can see these.</p>
+        </div>
+        <div className="notes-header__actions">
+          {result && <span className="note-count">{result.pagination.total} total</span>}
+          <Button onClick={openCreate} className="btn-cta">
+            <span className="btn-plus">+</span> New note
+          </Button>
+        </div>
       </div>
-
-      {/* ---------- Composer ---------- */}
-      <form className={`composer ${composerOpen ? 'is-open' : ''}`} onSubmit={create}>
-        {!composerOpen ? (
-          <button
-            type="button"
-            className="composer-trigger"
-            onClick={() => {
-              setComposerOpen(true);
-              setTimeout(() => composerContentRef.current?.focus(), 0);
-            }}
-          >
-            <span className="composer-trigger__icon">+</span>
-            Take a note…
-          </button>
-        ) : (
-          <>
-            <input
-              className="composer-title"
-              placeholder="Title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              required
-            />
-            <textarea
-              ref={composerContentRef}
-              className="composer-body"
-              placeholder="Write something…"
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-              rows={4}
-            />
-            <div className="composer-actions">
-              <button type="button" className="btn-ghost" onClick={closeComposer}>
-                Cancel
-              </button>
-              <Button type="submit" loading={submitting}>
-                Add note
-              </Button>
-            </div>
-          </>
-        )}
-      </form>
 
       {error && <p className="error">{error}</p>}
 
@@ -193,11 +150,11 @@ export const Notes = () => {
       ) : (
         <>
           <div className="notes-grid">
-            {notes.map((note) => (
+            {notes.map((note, i) => (
               <article
                 key={note._id}
                 className="note-card"
-                style={{ ['--accent' as string]: accentFor(note._id) }}
+                style={{ ['--accent' as string]: accentFor(note._id), ['--i' as string]: i }}
               >
                 <h3 className="note-card__title">{note.title}</h3>
                 <p className="note-card__body">{note.content}</p>
@@ -231,25 +188,41 @@ export const Notes = () => {
         </>
       )}
 
+      {/* ---------- Create modal ---------- */}
+      {creating && (
+        <Modal title="New note" onClose={() => setCreating(false)}>
+          <form onSubmit={create} className="modal-form">
+            <input
+              className="composer-title"
+              placeholder="Title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              required
+              autoFocus
+            />
+            <textarea
+              className="composer-body"
+              placeholder="Write something…"
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              rows={6}
+            />
+            <div className="composer-actions">
+              <button type="button" className="btn-ghost" onClick={() => setCreating(false)}>
+                Cancel
+              </button>
+              <Button type="submit" loading={submitting}>
+                Add note
+              </Button>
+            </div>
+          </form>
+        </Modal>
+      )}
+
       {/* ---------- Edit modal ---------- */}
       {editing && (
-        <div className="modal-overlay" onMouseDown={() => setEditing(null)}>
-          <form
-            className="modal"
-            onMouseDown={(e) => e.stopPropagation()}
-            onSubmit={saveEdit}
-          >
-            <div className="modal-header">
-              <h3>Edit note</h3>
-              <button
-                type="button"
-                className="icon-btn"
-                aria-label="Close"
-                onClick={() => setEditing(null)}
-              >
-                ✕
-              </button>
-            </div>
+        <Modal title="Edit note" onClose={() => setEditing(null)}>
+          <form onSubmit={saveEdit} className="modal-form">
             <input
               className="composer-title"
               placeholder="Title"
@@ -274,7 +247,7 @@ export const Notes = () => {
               </Button>
             </div>
           </form>
-        </div>
+        </Modal>
       )}
     </div>
   );

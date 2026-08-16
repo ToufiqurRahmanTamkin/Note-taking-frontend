@@ -24,6 +24,32 @@ export interface Note {
   createdAt: string;
 }
 
+export type Privacy = 'public' | 'private';
+
+export interface Post {
+  id: string;
+  title: string;
+  body: string;
+  privacy: Privacy;
+  createdAt: string;
+}
+
+export interface Poster {
+  id: string;
+  name: string;
+  email: string;
+  publicPostCount: number;
+  totalPostCount: number;
+}
+
+export interface UserPostsResult {
+  _id: string;
+  name: string;
+  email: string;
+  postCount: number;
+  posts: Post[];
+}
+
 export interface Pagination {
   page: number;
   limit: number;

@@ -1,5 +1,5 @@
-import { Navigate, Route, Routes, Link, useNavigate } from 'react-router-dom';
-import { ReactNode } from 'react';
+import { Navigate, Route, Routes, Link, useLocation, useNavigate } from 'react-router-dom';
+import { ReactNode, useEffect, useState } from 'react';
 import { useAuth } from './context/AuthContext';
 import { Spinner } from './components/Spinner';
 import { Login } from './pages/Login';
@@ -8,7 +8,7 @@ import { Notes } from './pages/Notes';
 import { AdminUsers } from './pages/AdminUsers';
 import { AdminNotes } from './pages/AdminNotes';
 import { Interests } from './pages/Interests';
-import { UserPosts } from './pages/UserPosts';
+import { Posts } from './pages/Posts';
 
 /** Route guard: requires a logged-in user, and optionally the admin role. */
 const Protected = ({ children, adminOnly }: { children: ReactNode; adminOnly?: boolean }) => {
@@ -27,27 +27,50 @@ const Protected = ({ children, adminOnly }: { children: ReactNode; adminOnly?: b
 const NavBar = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  // Close the mobile drawer whenever the route changes.
+  useEffect(() => setMenuOpen(false), [location.pathname]);
+
   if (!user) return null;
+
   return (
     <nav>
-      <span className="brand">◆ Notes</span>
-      <Link to="/notes">My Notes</Link>
-      <Link to="/posts">Posts by User</Link>
-      {user.role === 'admin' && <Link to="/admin/users">Users</Link>}
-      {user.role === 'admin' && <Link to="/admin/notes">All Notes</Link>}
-      {user.role === 'admin' && <Link to="/admin/interests">Interests</Link>}
-      <span className="spacer" />
-      <span className="who">{user.name}</span>
-      <span className={`badge ${user.role === 'admin' ? 'admin' : ''}`}>{user.role}</span>
-      <button
-        className="btn-ghost"
-        onClick={() => {
-          logout();
-          navigate('/login');
-        }}
-      >
-        Logout
-      </button>
+      <div className="nav-row">
+        <span className="brand">◆ Notes</span>
+        <button
+          type="button"
+          className={`nav-toggle ${menuOpen ? 'is-open' : ''}`}
+          aria-label="Toggle menu"
+          aria-expanded={menuOpen}
+          onClick={() => setMenuOpen((v) => !v)}
+        >
+          <span />
+          <span />
+          <span />
+        </button>
+      </div>
+
+      <div className={`nav-links ${menuOpen ? 'is-open' : ''}`}>
+        <Link to="/notes">My Notes</Link>
+        <Link to="/posts">Posts</Link>
+        {user.role === 'admin' && <Link to="/admin/users">Users</Link>}
+        {user.role === 'admin' && <Link to="/admin/notes">All Notes</Link>}
+        {user.role === 'admin' && <Link to="/admin/interests">Interests</Link>}
+        <span className="spacer" />
+        <span className="who">{user.name}</span>
+        <span className={`badge ${user.role === 'admin' ? 'admin' : ''}`}>{user.role}</span>
+        <button
+          className="btn-ghost"
+          onClick={() => {
+            logout();
+            navigate('/login');
+          }}
+        >
+          Logout
+        </button>
+      </div>
     </nav>
   );
 };
@@ -72,7 +95,7 @@ export default function App() {
           path="/posts"
           element={
             <Protected>
-              <UserPosts />
+              <Posts />
             </Protected>
           }
         />
