@@ -32,13 +32,17 @@ export const Posts = () => {
   const [privacy, setPrivacy] = useState<Privacy>('public');
   const [posting, setPosting] = useState(false);
 
-  // Viewing one poster's notes.
-  const [viewing, setViewing] = useState<Poster | null>(null);
+  // Viewing one poster's notes — by id, so it works both from a poster card
+  // and from pasting a copied user id into the search box below.
+  const [viewingId, setViewingId] = useState<string | null>(null);
   const [viewResult, setViewResult] = useState<UserPostsResult | null>(null);
   const [viewLoading, setViewLoading] = useState(false);
   const [viewError, setViewError] = useState('');
 
   const [copiedId, setCopiedId] = useState<string | null>(null);
+
+  // Search-by-user-id box (e.g. an id copied from a poster card below).
+  const [searchId, setSearchId] = useState('');
 
   const loadPosters = useCallback(async () => {
     setError('');
@@ -79,13 +83,13 @@ export const Posts = () => {
     }
   };
 
-  const openView = async (poster: Poster) => {
-    setViewing(poster);
+  const openView = async (id: string) => {
+    setViewingId(id);
     setViewResult(null);
     setViewError('');
     setViewLoading(true);
     try {
-      const res = await api<{ data: UserPostsResult }>(`/aggregations/users/${poster.id}/posts`);
+      const res = await api<{ data: UserPostsResult }>(`/aggregations/users/${id}/posts`);
       setViewResult(res.data);
     } catch (err) {
       setViewError((err as Error).message);
@@ -93,6 +97,17 @@ export const Posts = () => {
       setViewLoading(false);
     }
   };
+
+  const searchById = (e: FormEvent) => {
+    e.preventDefault();
+    const id = searchId.trim();
+    if (id) openView(id);
+  };
+
+  // If the id being viewed belongs to a poster already in the directory, use
+  // their name for an instant modal title while the fetch is in flight.
+  const knownPoster = posters.find((p) => p.id === viewingId);
+  const viewTitle = viewResult ? `${viewResult.name}'s notes` : knownPoster ? `${knownPoster.name}'s notes` : 'Notes';
 
   const copyId = async (id: string) => {
     try {
@@ -119,6 +134,23 @@ export const Posts = () => {
       </div>
 
       {error && <p className="error">{error}</p>}
+
+      <form onSubmit={searchById} className="card">
+        <h3>Search notes by user ID</h3>
+        <p className="muted">Paste a user id copied from a poster card below to jump straight to their notes.</p>
+        <div className="row">
+          <input
+            className="mono"
+            placeholder="Paste a user id…"
+            value={searchId}
+            onChange={(e) => setSearchId(e.target.value)}
+            style={{ flex: 1 }}
+          />
+          <Button type="submit" loading={viewLoading && viewingId === searchId.trim()} disabled={!searchId.trim()}>
+            View notes
+          </Button>
+        </div>
+      </form>
 
       <h3 className="section-heading">Posters</h3>
 
@@ -166,7 +198,7 @@ export const Posts = () => {
                 </button>
               </div>
 
-              <button type="button" className="btn-ghost poster-card__view" onClick={() => openView(p)}>
+              <button type="button" className="btn-ghost poster-card__view" onClick={() => openView(p.id)}>
                 View all notes
               </button>
             </article>
@@ -233,8 +265,8 @@ export const Posts = () => {
       )}
 
       {/* ---------- View a poster's notes ---------- */}
-      {viewing && (
-        <Modal title={`${viewing.name}'s notes`} onClose={() => setViewing(null)} wide>
+      {viewingId && (
+        <Modal title={viewTitle} onClose={() => setViewingId(null)} wide>
           {viewLoading ? (
             <div className="loading-wrap">
               <Spinner size="lg" dark />

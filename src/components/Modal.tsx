@@ -1,4 +1,5 @@
 import { ReactNode, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 
 interface Props {
   title: string;
@@ -8,7 +9,13 @@ interface Props {
   wide?: boolean;
 }
 
-/** Shared dark, glassy modal shell used across notes and posts. Closes on Escape or backdrop click. */
+/**
+ * Shared dark, glassy modal shell used across notes and posts. Closes on
+ * Escape or backdrop click. Rendered via a portal straight into <body> so it
+ * always sits above the navbar, regardless of any transform/animation on an
+ * ancestor (a CSS transform creates a new stacking context that would
+ * otherwise trap the modal's z-index below the nav's).
+ */
 export const Modal = ({ title, onClose, children, wide }: Props) => {
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose();
@@ -16,7 +23,7 @@ export const Modal = ({ title, onClose, children, wide }: Props) => {
     return () => window.removeEventListener('keydown', onKey);
   }, [onClose]);
 
-  return (
+  return createPortal(
     <div className="modal-overlay" onMouseDown={onClose}>
       <div
         className={`modal ${wide ? 'modal--wide' : ''}`}
@@ -33,6 +40,7 @@ export const Modal = ({ title, onClose, children, wide }: Props) => {
         </div>
         {children}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
